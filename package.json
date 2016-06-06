@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+		"build": "NODE_ENV=production BABEL_ENV=production webpack --config webpack-build-config.js",
+		"start": "node ./bin/www",
+		"start-build": "NODE_ENV=production node ./bin/www"
   },
   "dependencies": {
     "body-parser": "~1.13.2",

@@ -1,3 +1,4 @@
+var isProduction = process.env.NODE_ENV === 'production';
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -8,11 +9,13 @@ var mongoose = require('mongoose');
 var db = mongoose.connection;
 
 // Webpack
-var webpack = require('webpack');
-var webpackDevMiddleware = require('webpack-dev-middleware');
-var webpackHotMiddleware = require('webpack-hot-middleware');
-var config = require('./webpack-dev-config');
-var compiler = webpack(config);
+if (!isProduction) {
+	var webpack = require('webpack');
+	var webpackDevMiddleware = require('webpack-dev-middleware');
+	var webpackHotMiddleware = require('webpack-hot-middleware');
+	var config = require('./webpack-dev-config');
+	var compiler = webpack(config);
+}
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -32,15 +35,18 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'build')));
-app.use(webpackDevMiddleware(compiler, {
-	noInfo: false,
-	stats: {
-		colors: true,
-		cached: false
-	},
-	publicPath: config.output.publicPath
-}));
-app.use(webpackHotMiddleware(compiler));
+
+if (!isProduction) {
+	app.use(webpackDevMiddleware(compiler, {
+		noInfo: false,
+		stats: {
+			colors: true,
+			cached: false
+		},
+		publicPath: config.output.publicPath
+	}));
+	app.use(webpackHotMiddleware(compiler));
+}
 
 app.use('/', routes);
 app.use('/users', users);
