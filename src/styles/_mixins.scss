@@ -1,0 +1,8 @@
+/**
+ * Created by Ash on 2016-06-06.
+ */
+
+
+@mixin transition {
+	transition: all $duration $timing-func;
+}

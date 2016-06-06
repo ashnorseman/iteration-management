@@ -1,0 +1,24 @@
+/**
+ * Created by Ash on 2016-06-06.
+ */
+
+
+th,
+td {
+	border-bottom: 0.1rem solid $color-border;
+	padding: 0.8rem;
+}
+
+th {
+	color: $color-text-dark;
+	font-weight: 500;
+}
+
+tbody tr:nth-child(odd) {
+	background: $color-bg-gray-lighter;
+}
+
+tbody tr:hover {
+	background: lighten($color-primary, 43%);
+	cursor: pointer;
+}

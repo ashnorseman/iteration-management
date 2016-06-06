@@ -1,0 +1,45 @@
+/**
+ * Created by Ash on 2016-06-06.
+ */
+
+
+[class^=status],
+[class^=priority] {
+	border-radius: 0.25em;
+	color: $color-text-inverted;
+	letter-spacing: 0.1rem;
+	font-size: $font-sm;
+	padding: 0.25em 0.5em;
+}
+
+.status-not-started {
+	background: $color-not-started;
+}
+
+.status-in-progress {
+	background: $color-in-progress;
+}
+
+.status-success {
+	background: $color-success;
+}
+
+.status-failure {
+	background: $color-failure;
+}
+
+.cv-large {
+	color: $color-failure;
+}
+
+.priority-0 {
+	background: $color-p0;
+}
+
+.priority-1 {
+	background: $color-p1;
+}
+
+.priority-2 {
+	background: $color-p2;
+}

@@ -1,0 +1,19 @@
+/**
+ * Created by Ash on 2016-06-06.
+ */
+
+
+button {
+	background: $color-primary;
+	border: 0;
+	color: $color-text-inverted;
+	height: $button-height;
+	letter-spacing: 0.1rem;
+	min-width: 5em;
+	padding: 0 1em;
+	@include transition;
+
+	&:hover {
+		background: darken($color-primary, 5%);
+	}
+}

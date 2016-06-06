@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <div class="task-editor">
+      <h2>Tasks</h2>
+      <form action="/iterations/<%= iteration._id %>/tasks" method="post" id="task-form">
+        <dl>
+          <dt>Module: </dt>
+          <dd><input type="text" name="module"></dd>
+          <dt>Sub-Module: </dt>
+          <dd><input type="text" name="subModule"></dd>
+          <dt>Task Name: </dt>
+          <dd><input type="text" name="taskName" required></dd>
+          <dt>Priority: </dt>
+          <dd>
+            <select name="priority">
+              <option value="0">P0</option>
+              <option value="1">P1</option>
+              <option value="2">P2</option>
+            </select>
+          </dd>
+          <dt>Estimates:</dt>
+          <dd>
+            <ul id="estimates" class="estimates"></ul>
+          </dd>
+          <dt>Assignee: </dt>
+          <dd>
+            <select name="assignee" id="assignee">
+              <option></option>
+            </select>
+          </dd>
+          <dt>Status: </dt>
+          <dd>
+            <select name="status">
+              <option value="NOT_STARTED">未开始</option>
+              <option value="IN_PROGRESS">开发中</option>
+              <option value="DEVELOPED">开发已完成</option>
+              <option value="TEST_FAILED">测试不通过</option>
+              <option value="TEST_PASSED">测试通过</option>
+            </select>
+          </dd>
+          <dt></dt>
+          <dd><button type="button" id="submit-task">Submit</button></dd>
+        </dl>
+      </form>
+    </div>
+
+    <h2>Iteration</h2>
+    <form action="/iterations/<%= iteration._id %>" method="post" id="edit-form">
+      <dl>
+        <dt>Year: </dt>
+        <dd>
+          <select name="year" required>
+            <option value="2016">2016</option>
+          </select>
+        </dd>
+        <dt>Number: </dt>
+        <dd><input type="number" name="number" required></dd>
+        <dt>Start Date: </dt>
+        <dd><input type="date" name="startDate" required></dd>
+        <dt>End Date: </dt>
+        <dd><input type="date" name="endDate" required></dd>
+        <dt>Deadline: </dt>
+        <dd><input type="date" name="deadline"></dd>
+        <dt>Developers: </dt>
+        <dd id="developer-list"></dd>
+        <dt>Status: </dt>
+        <dd>
+          <select name="status">
+            <option value="NOT_STARTED">未开始</option>
+            <option value="IN_PROGRESS">进行中</option>
+            <option value="SUCCESS">成功</option>
+            <option value="FAILURE">失败</option>
+          </select>
+        </dd>
+        <dt></dt>
+        <dd>
+          <button type="button" id="submit-edit">Submit</button>
+          <button type="button" id="print-notes">Print Notes</button>
+        </dd>
+      </dl>
+    </form>
+
+    <h2>Task List</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Module</th>
+          <th>Sub-Module</th>
+          <th>Task Name</th>
+          <th>Priority</th>
+          <th>Estimate</th>
+          <th id="insert-estimates">Assignee</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="task-list"></tbody>
+    </table>
+
+    <h2>Task Summary</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>P0</th>
+          <th>P1</th>
+          <th>P2</th>
+          <th>Total</th>
+          <th>Summary</th>
+        </tr>
+      </thead>
+      <tbody id="summary-table"></tbody>
+    </table>
+
+    <script>
+      var users = [],
+          iteration = {};
+
+      // Users
+      fetch('/users')
+        .then(function (res) {
+          return res.json();
+        })
+        .then(function (res) {
+          var developerList = document.getElementById('developer-list'),
+              assignee = document.getElementById('assignee'),
+              estimates = document.getElementById('estimates'),
+              insertEstimates = document.getElementById('insert-estimates');
+
+          users = res;
+
+          res.forEach(function (user) {
+            developerList.innerHTML +=
+              ('<label><input type="checkbox" name="developers" value=' + user._id + '> ' + user.name + '</label>');
+            assignee.innerHTML +=
+              ('<option value="' + user._id + '">' + user.name + '</option>');
+
+            estimates.innerHTML +=
+              ('<li><label>' + user.name + '</label><input type="text" name="estimates" data-id="' + user._id + '"></li>');
+
+            var th = document.createElement('th');
+
+            th.innerHTML = user.name.slice(-2);
+
+            insertEstimates.parentNode.insertBefore(th, insertEstimates);
+          });
+        })
+        .then(function () {
+
+          // Iterations
+          fetch('/iterations/<%= iteration._id %>')
+            .then(function (res) {
+              return res.json();
+            })
+            .then(function (res) {
+              iteration = res;
+
+              Object.keys(res).forEach(function (key) {
+                var input = document.getElementsByName(key);
+
+                if (!input[0]) return;
+
+                if (input[0].type !== 'checkbox') {
+                  input[0].value = res[key];
+                } else {
+
+                  for (let i = 0; i < input.length; i++) {
+                    input[i].checked = res.developers.includes(input[i].value);
+                  }
+                }
+              });
+
+              res.tasks.forEach(function (task) {
+                var taskList = document.getElementById('task-list'),
+                    dev = task.estimates.find(function (estimate) { return estimate.developer === task.assignee; }),
+                    user = users.find(function (user) { return user._id === task.assignee; });
+
+                taskList.innerHTML +=
+                  ('<tr data-id="' + task._id + '">' +
+                  '<td>' + task.module + '</td>' +
+                  '<td>' + task.subModule + '</td>' +
+                  '<td>' + task.taskName + '</td>' +
+                  '<td>P' + task.priority + '</td>' +
+                  '<td>' + (dev ? dev.time : '') + '</td><td>' +
+                  users.map(function (user) {
+                    var estimate = task.estimates.find(function (estimate) {
+                      return estimate.developer === user._id;
+                    });
+
+                    return estimate ? estimate.time : '';
+                  }).join('</td><td>') +
+                  '</td><td>' + (user ? user.name : '') + '</td>' +
+                  '<td>' + task.status + '</td>' +
+                  '<td>' +
+//                  '<a href="javascript:void(0);" style="margin-right: 1em;" onclick="deleteTask(event)">删除</a>' +
+                  '<a href="javascript:void(0);" onclick="editTask(event)">编辑</a>' +
+                  '</td>' +
+                  '</tr>');
+              });
+
+
+              var table = document.getElementById('summary-table');
+
+              users.forEach(function (user) {
+                if (user.position === 'QA') return;
+
+                var tr = document.createElement('tr');
+
+                tr.innerHTML += '<th>' + user.name + '</th>';
+
+                var summary = res.tasks.reduce(function (result, task) {
+                  if (task.assignee === user._id) {
+                    var assignee = task.estimates.find(function (estimate) {
+                      return estimate.developer === user._id;
+                    });
+
+                    if (assignee) result[task.priority] += assignee.time;
+                  }
+
+                  return result;
+                }, [0, 0, 0]),
+
+                   total = res.tasks.reduce(function (result, task) {
+                     console.log(task);
+                     if (task.assignee === user._id && (task.status === 'TEST_PASSED' || task.status === 'DEVELOPED')) {
+                       var estimate = task.estimates.find(function (estimate) {
+                         return estimate.developer === user._id;
+                       });
+
+                       result += (estimate ? estimate.time : 0);
+                     }
+
+                     return result;
+                   }, 0);
+
+                tr.innerHTML += '<td>' + summary[0] + '</td>';
+                tr.innerHTML += '<td>' + summary[1] + '</td>';
+                tr.innerHTML += '<td>' + summary[2] + '</td>';
+                tr.innerHTML += '<td>' + (summary[0] + summary[1] + summary[2]) + '</td>';
+
+                tr.innerHTML += '<td>' + total + '</td>';
+
+                table.appendChild(tr);
+              });
+            });
+        });
+
+      function deleteTask(event) {
+        var id = event.target.parentNode.parentNode.dataset.id;
+
+        fetch('/iterations/<%= iteration._id %>/tasks/' + id, {
+          method: 'DELETE'
+        })
+          .then(function () {
+            location.reload();
+          });
+      }
+
+      function editTask(event) {
+        var id = event.target.parentNode.parentNode.dataset.id,
+            taskForm = document.getElementById('task-form'),
+            task = iteration.tasks.find(function (task) { return task._id === id; });
+
+        taskForm.action = '/iterations/<%= iteration._id %>/tasks/' + id;
+        taskForm.dataset.id = id;
+
+        Object.keys(task).forEach(function (key) {
+
+          if (key !== 'estimates') {
+
+            if (document.getElementsByName(key)[0]) {
+              document.getElementsByName(key)[0].value = task[key];
+            }
+          } else if (task.estimates) {
+            task.estimates.forEach(function (estimate) {
+              document.querySelector('[name="estimates"][data-id="' + estimate.developer + '"]').value = estimate.time;
+            });
+          }
+        });
+      }
+
+      document.getElementById('submit-edit').addEventListener('click', function () {
+        var inputs = document.getElementById('edit-form').querySelectorAll('[name]'),
+            result = {};
+
+        for (let i = 0; i < inputs.length; i++) {
+
+          if (inputs[i].type !== 'checkbox') {
+            result[inputs[i].name] = inputs[i].value;
+          } else if (inputs[i].checked) {
+            result[inputs[i].name] || (result[inputs[i].name] = []);
+            result[inputs[i].name].push(inputs[i].value);
+          }
+        }
+
+        fetch('/iterations/<%= iteration._id %>', {
+          method: 'PUT',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(result)
+        });
+      });
+
+      document.getElementById('submit-task').addEventListener('click', function () {
+        var taskForm = document.getElementById('task-form'),
+            inputs = taskForm.querySelectorAll('[name]'),
+            result = { estimates: [] };
+
+        for (let i = 0; i < inputs.length; i++) {
+
+          if (inputs[i].name !== 'estimates') {
+            result[inputs[i].name] = inputs[i].value;
+          } else if (inputs[i].value) {
+            result.estimates.push({
+              developer: inputs[i].dataset.id,
+              time: inputs[i].value
+            });
+          }
+        }
+
+        fetch('/iterations/<%= iteration._id %>/tasks/' + (taskForm.dataset.id || ''), {
+          method: taskForm.dataset.id ? 'PUT' : 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(result)
+        });
+      });
+    </script>
+  </body>
+</html>

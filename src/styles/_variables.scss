@@ -1,0 +1,68 @@
+/**
+ * Created by Ash on 2016-06-06.
+ */
+
+
+// Color
+// ---------------------------
+
+$color-bg: #fff;
+$color-bg-gray-light: #ededed;
+$color-bg-gray-lighter: #f5f5f5;
+$color-bg-gray-lightest: #fcfcfc;
+
+$color-border: #dcdcdc;
+
+$color-text: #797979;
+$color-text-dark: #666;
+$color-text-inverted: #fff;
+$color-header-text: #435966;
+$color-title-text: #505458;
+
+$color-primary: #2196f3;
+
+$color-success: #3ec845;
+$color-failure: #e96154;
+$color-in-progress: #aa81f3;
+$color-not-started: #fbca35;
+
+$color-p0: #ff8acc;
+$color-p1: #ccc;
+$color-p2: #ccc;
+
+
+// Typography
+// ---------------------------
+
+$font-base: 1.4rem;
+$font-sm: 1.2rem;
+$font-lg: 1.6rem;
+$font-family: 'Helvetica Neue', 'Microsoft Yahei', sans-serif;
+
+$line-height: 1.5;
+
+
+// Button
+// ---------------------------
+
+$button-height: 3.2rem;
+
+
+// Structure
+// ---------------------------
+
+$site-width: 95%;
+$gap: 1rem;
+
+
+// Header
+// ---------------------------
+
+$logo-size: 2.8rem;
+
+
+// Animation
+// ---------------------------
+
+$duration: 0.2s;
+$timing-func: ease-in-out;
