@@ -8,6 +8,8 @@ import { connect } from 'react-redux';
 
 import { ITERATION_STATUS } from '../constants';
 
+import IterationActions from '../actions/IterationActions';
+
 
 @connect(state => ({
 	iteration: state.iteration,
@@ -16,6 +18,7 @@ import { ITERATION_STATUS } from '../constants';
 export default class IterationContainer extends Component {
 
 	static propTypes = {
+		dispatch: PropTypes.func,
 		iteration: PropTypes.object,
 		user: PropTypes.object
 	};
@@ -26,20 +29,73 @@ export default class IterationContainer extends Component {
 	}
 
 
+	toggleAddMode() {
+		this.props.dispatch(IterationActions.toggleAddMode());
+	}
+
+
 	render() {
 		const {
 			iteration,
 			user
 		} = this.props,
 
-			iterationList = iteration.iterationList;
+			userList = user.userList || [],
+			iterationList = iteration.iterationList || [],
+
+			addForm = iteration.iterationAddMode
+				? <form className="iteration-form" action="/iterations" method="POST">
+						<dl>
+							<dt>Year: </dt>
+							<dd>
+								<select name="year" defaultValue="2016">
+									<option value="2016">2016</option>
+								</select>
+							</dd>
+							<dt>Number: </dt>
+							<dd><input type="number" name="number" /></dd>
+							<dt>Status: </dt>
+							<dd>
+								<select name="status" defaultValue="NOT_STARTED">
+									<option value="NOT_STARTED">未开始</option>
+									<option value="IN_PROGRESS">进行中</option>
+									<option value="SUCCESS">成功</option>
+									<option value="FAILURE">失败</option>
+								</select>
+							</dd>
+							<dt>Start Date: </dt>
+							<dd><input type="date" name="startDate" /></dd>
+							<dt>End Date: </dt>
+							<dd><input type="date" name="endDate" /></dd>
+							<dt>Deadline: </dt>
+							<dd><input type="date" name="deadline" /></dd>
+							<dt>Developers: </dt>
+							<dd>
+								{
+									userList.map(user => {
+										return (
+											<label className="check-box" key={user._id}>
+												<input type="checkbox" name="developers" value={user._id} defaultChecked />
+												{user.name}
+											</label>
+										);
+									})
+								}
+							</dd>
+						</dl>
+
+						<div className="form-submit"><button>Submit</button></div>
+					</form>
+				: null;
 
 		return (
 			<main>
 				<header className="page-header">
 					<h1>Iteration</h1>
-					<button type="button">Add Iteration</button>
+					<button type="button" onClick={::this.toggleAddMode}>Add Iteration</button>
 				</header>
+
+				{addForm}
 
 				<div className="card">
 					<h2>Iteration List</h2>

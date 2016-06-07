@@ -22,6 +22,11 @@ export default function (state = initialState, action = {}) {
 			...state,
 			currentIteration: action.data || {}
 		};
+	case 'toggle-add-iteration-mode':
+		return {
+			...state,
+			iterationAddMode: !state.iterationAddMode
+		};
 	}
 
 	return state;

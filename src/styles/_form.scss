@@ -1,0 +1,59 @@
+/**
+ * Created by Ash on 2016-06-07.
+ */
+
+
+input[type=text],
+input[type=number],
+input[type=date],
+select {
+	border: 0.1rem solid $color-border;
+	height: $control-height;
+	line-height: $control-height;
+	padding: 0 0.5em;
+	width: $control-width;
+}
+
+input[type=checkbox] {
+	margin-right: 0.25em;
+	vertical-align: 0.1rem;
+}
+
+select {
+	appearance: none;
+}
+
+form {
+	line-height: $control-height;
+	overflow: auto;
+
+	dt,
+	dd {
+		float: left;
+		margin-bottom: $gap;
+	}
+
+	dt {
+		margin-left: $gap * 2;
+		text-align: right;
+		width: 8rem;
+	}
+
+	dd {
+		margin-left: 0.5rem;
+		margin-right: 0.5rem;
+
+		&:nth-of-type(3n) + dt {
+			clear: left;
+		}
+	}
+
+	.form-submit {
+		margin-left: 8rem + $gap * 2 + 0.5rem;
+		clear: left;
+	}
+}
+
+.check-box {
+	margin-right: $gap * 2;
+}

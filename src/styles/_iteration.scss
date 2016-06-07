@@ -43,3 +43,8 @@
 .priority-2 {
 	background: $color-p2;
 }
+
+.iteration-form {
+	@extend .card;
+	margin-bottom: $gap * 2;
+}

@@ -45,5 +45,12 @@ export default {
 					});
 				});
 		};
+	},
+
+
+	toggleAddMode() {
+		return {
+			type: 'toggle-add-iteration-mode'
+		};
 	}
 };
