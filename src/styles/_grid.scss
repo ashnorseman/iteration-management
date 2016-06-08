@@ -22,3 +22,22 @@ tbody tr:hover {
 	background: lighten($color-primary, 43%);
 	cursor: pointer;
 }
+
+.table-add {
+	padding-top: $gap * 2;
+	text-align: right;
+}
+
+.grid-edit {
+	padding-top: 0;
+	padding-bottom: 0;
+
+	input[type=text],
+	input[type=number],
+	input[type=date],
+	select {
+		border: 0;
+		height: $font-base * $line-height + 0.8rem * 2;
+		width: 100%;
+	}
+}

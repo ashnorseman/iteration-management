@@ -27,6 +27,24 @@ export default function (state = initialState, action = {}) {
 			...state,
 			iterationAddMode: !state.iterationAddMode
 		};
+	case 'task-edit-mode':
+		const taskIndex = (state.currentIteration.tasks || [])
+			.findIndex(task => task._id === action.data.taskId);
+
+		return {
+			...state,
+			currentIteration: {
+				...state.currentIteration,
+				tasks: [
+					...state.currentIteration.tasks.slice(0, taskIndex),
+					{
+						...state.currentIteration.tasks[taskIndex],
+						edit: action.data.field
+					},
+					...state.currentIteration.tasks.slice(taskIndex + 1)
+				]
+			}
+		};
 	}
 
 	return state;

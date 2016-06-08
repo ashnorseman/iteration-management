@@ -7,6 +7,7 @@ input[type=text],
 input[type=number],
 input[type=date],
 select {
+	background: $color-bg;
 	border: 0.1rem solid $color-border;
 	height: $control-height;
 	line-height: $control-height;
@@ -51,6 +52,11 @@ form {
 	.form-submit {
 		margin-left: 8rem + $gap * 2 + 0.5rem;
 		clear: left;
+
+		button {
+			margin-right: $gap * 2;
+			vertical-align: top;
+		}
 	}
 }
 

@@ -84,9 +84,11 @@ export default class IterationContainer extends Component {
 							</dd>
 						</dl>
 
-						<div className="form-submit"><button>Submit</button></div>
+						<div className="form-submit"><button>Add</button></div>
 					</form>
 				: null;
+
+		console.log(iterationList);
 
 		return (
 			<main>

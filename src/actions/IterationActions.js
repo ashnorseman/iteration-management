@@ -52,5 +52,16 @@ export default {
 		return {
 			type: 'toggle-add-iteration-mode'
 		};
+	},
+
+
+	editTask(taskId, field) {
+		return {
+			type: 'task-edit-mode',
+			data: {
+				taskId,
+				field
+			}
+		};
 	}
 };

@@ -17,3 +17,13 @@ button {
 		background: darken($color-primary, 5%);
 	}
 }
+
+.button-minor {
+	border: 0.1rem solid $color-border;
+	color: $color-text;
+
+	&,
+	&:hover {
+		background: $color-bg;
+	}
+}
