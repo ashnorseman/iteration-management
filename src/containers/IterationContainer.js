@@ -88,8 +88,6 @@ export default class IterationContainer extends Component {
 					</form>
 				: null;
 
-		console.log(iterationList);
-
 		return (
 			<main>
 				<header className="page-header">

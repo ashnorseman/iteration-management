@@ -55,4 +55,8 @@ h2 {
 	border: 0.1rem solid $color-border;
 	border-radius: 0.5rem;
 	padding: $gap * 2;
+
+  & + & {
+    margin-top: $gap * 2;
+  }
 }

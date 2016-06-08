@@ -55,13 +55,83 @@ export default {
 	},
 
 
-	editTask(taskId, field) {
+  addTask() {
+		return {
+			type: 'add-task'
+		};
+	},
+
+
+	taskEditMode(taskId, field) {
 		return {
 			type: 'task-edit-mode',
 			data: {
 				taskId,
 				field
 			}
+		};
+	},
+
+
+  editPropValue(field, value) {
+		return {
+			type: 'edit-prop-value',
+			data: {
+				field,
+				value
+			}
+		};
+	},
+
+
+  toggleDeveloper(userId, checked) {
+		return {
+			type: 'toggle-developer',
+			data: {
+        userId,
+        checked
+			}
+		};
+	},
+
+
+	editTaskValue(taskId, field, value) {
+		return {
+			type: 'edit-task-value',
+			data: {
+				taskId,
+				field,
+				value
+			}
+		};
+	},
+
+
+  editTaskEstimateValue(taskId, developerId, value) {
+		return {
+			type: 'edit-task-estimate-value',
+			data: {
+				taskId,
+        developerId,
+				value
+			}
+		};
+	},
+
+
+	saveIteration(data) {
+
+		return dispatch => {
+
+			return fetchie
+				.put(`/iterations/${data._id}`)
+				.send(data)
+				.then(res => {
+					dispatch({
+						type: 'fetch-iteration-item-success',
+						data: res
+					});
+				});
 		};
 	}
 };

@@ -12,6 +12,18 @@ export const ITERATION_STATUS = {
 		text: 'In Progress',
 		className: 'status-in-progress'
 	},
+	'DEVELOPED': {
+		text: 'Developed',
+		className: 'status-developed'
+	},
+	'TEST_FAILED': {
+		text: 'Test Failed',
+		className: 'status-failure'
+	},
+	'TEST_PASSED': {
+		text: 'Test Passed',
+		className: 'status-success'
+	},
 	'SUCCESS': {
 		text: 'Success',
 		className: 'status-success'
