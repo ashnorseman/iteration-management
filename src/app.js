@@ -16,6 +16,7 @@ import createStore from 'redux/lib/createStore';
 import applyMiddleware from 'redux/lib/applyMiddleware';
 import { Provider } from 'react-redux';
 import thunkMiddleware from 'redux-thunk';
+import fetchie from 'fetchie';
 
 import reducers from './reducers';
 
@@ -29,6 +30,11 @@ import UserActions from './actions/UserActions';
 
 
 const store = applyMiddleware(thunkMiddleware)(createStore)(reducers);
+
+fetchie
+  .use(function () {
+    this.timeout(100000);
+  });
 
 Promise.all([
 	store.dispatch(UserActions.fetchUserList()),

@@ -19,7 +19,7 @@ export default {
 			return fetchie
 				.get('/iterations')
 				.then(res => {
-					dispatch({
+          dispatch({
 						type: 'fetch-iteration-list-success',
 						data: res
 					});
