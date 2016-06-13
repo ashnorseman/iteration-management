@@ -99,8 +99,16 @@ export default class IterationItemContainer extends Component {
   }
 
 
-  editGrid(taskId, field) {
+  editGrid(taskId, field, e) {
+    const target = e.target;
+
     this.props.dispatch(IterationActions.taskEditMode(taskId, field));
+
+    setTimeout(() => {
+      const input = target.querySelectorAll('input, select')[0];
+
+      input && input.focus();
+    }, 0);
   }
 
 
@@ -129,11 +137,18 @@ export default class IterationItemContainer extends Component {
   }
 
 
+  saveTask(task) {
+    this.props.dispatch(IterationActions.saveTask(this.props.iteration.currentIteration, task));
+  }
+
+
   render() {
     const {
       iteration: { currentIteration = {} },
       user: { userData = {}, userList = [] }
-    } = this.props;
+    } = this.props,
+
+      viewMode = ['FAILURE', 'SUCCESS'].includes(currentIteration.status) || userData.isMaster;
 
     return (
       <main>
@@ -220,6 +235,7 @@ export default class IterationItemContainer extends Component {
             userData.isMaster
               ? <div className="form-submit">
                   <button type="button" onClick={::this.save}>Edit</button>
+                  <a className="button button-minor" href={`#/print/${currentIteration._id}`}>Print</a>
                   <button type="button" className="button-minor">Delete</button>
                 </div>
               : null
@@ -236,27 +252,27 @@ export default class IterationItemContainer extends Component {
                 <th>Task Name</th>
                 <th style={{width: '3em'}}>Priority</th>
                 {
-                  userData.isMaster
+                  viewMode
                     ? <th style={{width: '5.5em'}}>Estimate</th>
                     : null
                 }
                 {
-                  userData.isMaster
+                  viewMode
                     ? userList.map(user => <th key={user._id} style={{width: '4.5em'}}>{user.name}</th>)
                     : <th style={{width: '4.5em'}}>{userData.name}</th>
                 }
                 {
-                  userData.isMaster
+                  viewMode
                     ? <th style={{width: '3.5em'}}>CV</th>
                     : null
                 }
                 {
-                  userData.isMaster
+                  viewMode
                     ? <th style={{width: '6em'}}>Assignee</th>
                     : null
                 }
                 {
-                  userData.isMaster
+                  viewMode
                     ? <th style={{width: '8em'}}>Status</th>
                     : null
                 }
@@ -281,7 +297,7 @@ export default class IterationItemContainer extends Component {
                             ? <input type="text"
                                      value={task.module}
                                      onChange={this.gridValueChange.bind(this, task._id, 'module')}
-                                     onBlur={::this.save} />
+                                     onBlur={this.saveTask.bind(this, task)} />
                             : task.module
                         }
                       </td>
@@ -292,7 +308,7 @@ export default class IterationItemContainer extends Component {
                             ? <input type="text"
                                      value={task.subModule}
                                      onChange={this.gridValueChange.bind(this, task._id, 'subModule')}
-                                     onBlur={::this.save} />
+                                     onBlur={this.saveTask.bind(this, task)} />
                             : task.subModule
                         }
                       </td>
@@ -303,7 +319,7 @@ export default class IterationItemContainer extends Component {
                             ? <input type="text"
                                      value={task.taskName}
                                      onChange={this.gridValueChange.bind(this, task._id, 'taskName')}
-                                     onBlur={::this.save} />
+                                     onBlur={this.saveTask.bind(this, task)} />
                             : task.taskName
                         }
                       </td>
@@ -313,7 +329,7 @@ export default class IterationItemContainer extends Component {
                           task.edit === 'priority'
                             ? <select value={task.priority}
                                       onChange={this.gridValueChange.bind(this, task._id, 'priority')}
-                                      onBlur={::this.save}>
+                                      onBlur={this.saveTask.bind(this, task)}>
                                 <option value="0">P0</option>
                                 <option value="1">P1</option>
                                 <option value="2">P2</option>
@@ -322,27 +338,27 @@ export default class IterationItemContainer extends Component {
                         }
                       </td>
                       {
-                        userData.isMaster
+                        viewMode
                           ? <td>
                               {finalEstimate && finalEstimate.time}
                             </td>
                           : null
                       }
                       {
-                        userData.isMaster
+                        viewMode
                           ? userList.map(user => {
                               const developer = task.estimates.find(estimate => estimate.developer === user._id);
 
                               return (
                                 <td className={task.edit === 'developer' ? 'grid-edit' : null}
                                     key={user._id}
-                                    onClick={this.editGrid.bind(this, task._id, 'developer')}>
+                                    onClick={userData.isMaster ? this.editGrid.bind(this, task._id, 'developer') : null}>
                                   {
                                     task.edit === 'developer'
                                       ? <input type="text"
                                                value={developer ? developer.time : ''}
                                                onChange={this.estimateValueChange.bind(this, task._id, user._id)}
-                                               onBlur={::this.save} />
+                                               onBlur={this.saveTask.bind(this, task)} />
                                       : developer && developer.time
                                   }
                                 </td>
@@ -351,7 +367,7 @@ export default class IterationItemContainer extends Component {
                           : this.generateEstimateField(task, userData)
                       }
                       {
-                        userData.isMaster
+                        viewMode
                           ? <td>
                               <span className={cv > 0.5 ? 'cv-large' : null}>
                                 {cv ? cv.toFixed(2) : null}
@@ -360,40 +376,41 @@ export default class IterationItemContainer extends Component {
                           : null
                       }
                       {
-                        userData.isMaster
+                        viewMode
                           ? <td className={task.edit === 'assignee' ? 'grid-edit' : null}
-                                onClick={this.editGrid.bind(this, task._id, 'assignee')}>
+                                onClick={userData.isMaster ? this.editGrid.bind(this, task._id, 'assignee') : null}>
                               {
                                 task.edit === 'assignee'
                                   ? <select value={task.assignee}
                                             onChange={this.gridValueChange.bind(this, task._id, 'assignee')}
-                                            onBlur={::this.save}>
-                                  {
-                                    userList.map(user =>
-                                      <option value={user._id} key={user._id}>{user.name}</option>
-                                    )
-                                  }
-                                </select>
+                                            onBlur={this.saveTask.bind(this, task)}>
+                                      <option value="" />
+                                      {
+                                        userList.map(user =>
+                                          <option value={user._id} key={user._id}>{user.name}</option>
+                                        )
+                                      }
+                                    </select>
                                   : assignee && assignee.name
                               }
                             </td>
                           : null
                       }
                       {
-                        userData.isMaster
+                        viewMode
                           ? <td className={task.edit === 'status' ? 'grid-edit' : null}
-                                onClick={this.editGrid.bind(this, task._id, 'status')}>
+                                onClick={userData.isMaster ? this.editGrid.bind(this, task._id, 'status') : null}>
                               {
                                 task.edit === 'status'
                                   ? <select value={task.status}
                                             onChange={this.gridValueChange.bind(this, task._id, 'status')}
-                                            onBlur={::this.save}>
-                                  <option value="NOT_STARTED">Not Started</option>
-                                  <option value="IN_PROGRESS">In Progress</option>
-                                  <option value="DEVELOPED">Developed</option>
-                                  <option value="TEST_FAILED">Test Failed</option>
-                                  <option value="TEST_PASSED">Test Passed</option>
-                                </select>
+                                            onBlur={this.saveTask.bind(this, task)}>
+                                      <option value="NOT_STARTED">Not Started</option>
+                                      <option value="IN_PROGRESS">In Progress</option>
+                                      <option value="DEVELOPED">Developed</option>
+                                      <option value="TEST_FAILED">Test Failed</option>
+                                      <option value="TEST_PASSED">Test Passed</option>
+                                    </select>
                                   : <span className={ITERATION_STATUS[task.status].className}>
                                   {ITERATION_STATUS[task.status].text}
                                 </span>

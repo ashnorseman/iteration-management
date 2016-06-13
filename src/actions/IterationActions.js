@@ -133,5 +133,22 @@ export default {
 					});
 				});
 		};
+	},
+
+
+	saveTask(iteration, task) {
+
+		return dispatch => {
+
+			return fetchie
+				.put(`/iterations/${iteration._id}/tasks/${task._id}`)
+				.send(task)
+				.then(res => {
+					dispatch({
+						type: 'fetch-iteration-item-success',
+						data: res
+					});
+				});
+		};
 	}
 };

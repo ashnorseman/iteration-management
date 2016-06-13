@@ -3,10 +3,12 @@
  */
 
 
-button {
+button,
+.button {
 	background: $color-primary;
 	border: 0;
 	color: $color-text-inverted;
+  display: inline-block;
 	height: $button-height;
 	letter-spacing: 0.1rem;
 	min-width: 5em;

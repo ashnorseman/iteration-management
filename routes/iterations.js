@@ -117,7 +117,7 @@ router.delete('/:id/tasks/:taskId', function(req, res, next) {
 
 /* POST edit a task. */
 router.put('/:id/tasks/:taskId', function(req, res, next) {
-  if (!req.body.assignee) delete req.body.assignee;
+  if (!req.body.assignee) req.body.assignee = null;
 
   Iteration.findById(req.params.id, function (error, iteration) {
     if (error) console.log(error);

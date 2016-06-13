@@ -64,7 +64,8 @@ form {
 		margin-left: 8rem + $gap * 2 + 0.5rem;
 		clear: left;
 
-		button {
+		button,
+		.button {
 			margin-right: $gap * 2;
 			vertical-align: top;
 		}

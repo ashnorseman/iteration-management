@@ -1,0 +1,43 @@
+/**
+ * Created by Ash on 2016-06-13.
+ */
+
+
+.print {
+  padding: 0;
+}
+
+.print-item {
+  border: 0.1rem solid $color-print;
+  color: $color-print;
+  float: left;
+  font-size: $font-base;
+  line-height: 1.6;
+  margin-bottom: 1em;
+  padding: 0.25em 0.5em;
+  page-break-inside: avoid;
+  width: 49%;
+
+  &:nth-child(2n+1) {
+    margin-right: 2%;
+  }
+
+  p {
+    overflow: auto;
+  }
+}
+
+.print-assignee,
+.print-estimate,
+.print-end {
+  float: right;
+}
+
+.print-end {
+  width: 45%;
+}
+
+.print-task-name {
+  font-size: 1.25em;
+  height: 3.2em;
+}
