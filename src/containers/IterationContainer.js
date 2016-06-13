@@ -40,10 +40,11 @@ export default class IterationContainer extends Component {
 			user
 		} = this.props,
 
+			userData = user.userData || {},
 			userList = user.userList || [],
 			iterationList = iteration.iterationList || [],
 
-			addForm = iteration.iterationAddMode
+			addForm = iteration.iterationAddMode && userData.isMaster
 				? <form className="iteration-form" action="/iterations" method="POST">
 						<dl>
 							<dt>Year: </dt>
@@ -92,7 +93,12 @@ export default class IterationContainer extends Component {
 			<main>
 				<header className="page-header">
 					<h1>Iteration</h1>
-					<button type="button" onClick={::this.toggleAddMode}>Add Iteration</button>
+
+          {
+            userData.isMaster
+              ? <button type="button" onClick={::this.toggleAddMode}>Add Iteration</button>
+              : null
+          }
 				</header>
 
 				{addForm}

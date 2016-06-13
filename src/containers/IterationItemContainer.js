@@ -53,6 +53,25 @@ export default class IterationItemContainer extends Component {
   }
 
 
+  generateEstimateField(task, userData) {
+    const currentEstimate = task.estimates.find(estimate => estimate.developer === userData._id);
+
+    return (
+      <td className={task.edit === 'developer' ? 'grid-edit' : null}
+          onClick={this.editGrid.bind(this, task._id, 'developer')}>
+        {
+          task.edit === 'developer'
+            ? <input type="text"
+                     value={currentEstimate ? currentEstimate.time : ''}
+                     onChange={this.estimateValueChange.bind(this, task._id, userData._id)}
+                     onBlur={::this.save} />
+            : currentEstimate ? currentEstimate.time : ''
+        }
+      </td>
+    );
+  }
+
+
   getFinalEstimate(task) {
     const assignee = task.assignee;
 
@@ -113,7 +132,7 @@ export default class IterationItemContainer extends Component {
   render() {
     const {
       iteration: { currentIteration = {} },
-      user: { userList = [] }
+      user: { userData = {}, userList = [] }
     } = this.props;
 
     return (
@@ -128,7 +147,8 @@ export default class IterationItemContainer extends Component {
             <dd>
               <select name="year"
                       value={currentIteration.year || ''}
-                      onChange={this.iterationPropChange.bind(this, 'year')}>
+                      onChange={this.iterationPropChange.bind(this, 'year')}
+                      disabled={!userData.isMaster}>
                 <option value="2016">2016</option>
               </select>
             </dd>
@@ -137,13 +157,15 @@ export default class IterationItemContainer extends Component {
               <input type="number"
                      name="number"
                      value={currentIteration.number || ''}
-                     onChange={this.iterationPropChange.bind(this, 'number')} />
+                     onChange={this.iterationPropChange.bind(this, 'number')}
+                     disabled={!userData.isMaster} />
             </dd>
             <dt>Status: </dt>
             <dd>
               <select name="status"
                       value={currentIteration.status || ''}
-                      onChange={this.iterationPropChange.bind(this, 'status')}>
+                      onChange={this.iterationPropChange.bind(this, 'status')}
+                      disabled={!userData.isMaster}>
                 <option value="NOT_STARTED">未开始</option>
                 <option value="IN_PROGRESS">进行中</option>
                 <option value="SUCCESS">成功</option>
@@ -155,21 +177,24 @@ export default class IterationItemContainer extends Component {
               <input type="date"
                      name="startDate"
                      value={currentIteration.startDate || ''}
-                     onChange={this.iterationPropChange.bind(this, 'startDate')} />
+                     onChange={this.iterationPropChange.bind(this, 'startDate')}
+                     disabled={!userData.isMaster} />
             </dd>
             <dt>End Date: </dt>
             <dd>
               <input type="date"
                      name="endDate"
                      value={currentIteration.endDate || ''}
-                     onChange={this.iterationPropChange.bind(this, 'endDate')} />
+                     onChange={this.iterationPropChange.bind(this, 'endDate')}
+                     disabled={!userData.isMaster} />
             </dd>
             <dt>Deadline: </dt>
             <dd>
               <input type="date"
                      name="deadline"
                      value={currentIteration.deadline || ''}
-                     onChange={this.iterationPropChange.bind(this, 'deadline')} />
+                     onChange={this.iterationPropChange.bind(this, 'deadline')}
+                     disabled={!userData.isMaster} />
             </dd>
             <dt>Developers: </dt>
             <dd>
@@ -181,7 +206,8 @@ export default class IterationItemContainer extends Component {
                              name="developers"
                              value={user._id}
                              checked={(currentIteration.developers || []).includes(user._id) || false}
-                             onChange={this.toggleDeveloper.bind(this, user._id)} />
+                             onChange={this.toggleDeveloper.bind(this, user._id)}
+                             disabled={!userData.isMaster} />
                       {user.name}
                     </label>
                   );
@@ -190,10 +216,14 @@ export default class IterationItemContainer extends Component {
             </dd>
           </dl>
 
-          <div className="form-submit">
-            <button type="button" onClick={::this.save}>Edit</button>
-            <button type="button" className="button-minor">Delete</button>
-          </div>
+          {
+            userData.isMaster
+              ? <div className="form-submit">
+                  <button type="button" onClick={::this.save}>Edit</button>
+                  <button type="button" className="button-minor">Delete</button>
+                </div>
+              : null
+          }
         </form>
 
         <div className="card">
@@ -205,13 +235,31 @@ export default class IterationItemContainer extends Component {
                 <th style={{width: '7em'}}>Sub-Module</th>
                 <th>Task Name</th>
                 <th style={{width: '3em'}}>Priority</th>
-                <th style={{width: '5.5em'}}>Estimate</th>
                 {
-                  userList.map(user => <th key={user._id} style={{width: '4.5em'}}>{user.name}</th>)
+                  userData.isMaster
+                    ? <th style={{width: '5.5em'}}>Estimate</th>
+                    : null
                 }
-                <th style={{width: '3.5em'}}>CV</th>
-                <th style={{width: '6em'}}>Assignee</th>
-                <th style={{width: '8em'}}>Status</th>
+                {
+                  userData.isMaster
+                    ? userList.map(user => <th key={user._id} style={{width: '4.5em'}}>{user.name}</th>)
+                    : <th style={{width: '4.5em'}}>{userData.name}</th>
+                }
+                {
+                  userData.isMaster
+                    ? <th style={{width: '3.5em'}}>CV</th>
+                    : null
+                }
+                {
+                  userData.isMaster
+                    ? <th style={{width: '6em'}}>Assignee</th>
+                    : null
+                }
+                {
+                  userData.isMaster
+                    ? <th style={{width: '8em'}}>Status</th>
+                    : null
+                }
               </tr>
             </thead>
             <tbody>
@@ -227,7 +275,7 @@ export default class IterationItemContainer extends Component {
                   return (
                     <tr key={task._id}>
                       <td className={task.edit === 'module' ? 'grid-edit' : null}
-                          onClick={this.editGrid.bind(this, task._id, 'module')}>
+                          onClick={userData.isMaster ? this.editGrid.bind(this, task._id, 'module') : null}>
                         {
                           task.edit === 'module'
                             ? <input type="text"
@@ -238,7 +286,7 @@ export default class IterationItemContainer extends Component {
                         }
                       </td>
                       <td className={task.edit === 'subModule' ? 'grid-edit' : null}
-                          onClick={this.editGrid.bind(this, task._id, 'subModule')}>
+                          onClick={userData.isMaster ? this.editGrid.bind(this, task._id, 'subModule') : null}>
                         {
                           task.edit === 'subModule'
                             ? <input type="text"
@@ -249,7 +297,7 @@ export default class IterationItemContainer extends Component {
                         }
                       </td>
                       <td className={task.edit === 'taskName' ? 'grid-edit' : null}
-                          onClick={this.editGrid.bind(this, task._id, 'taskName')}>
+                          onClick={userData.isMaster ? this.editGrid.bind(this, task._id, 'taskName') : null}>
                         {
                           task.edit === 'taskName'
                             ? <input type="text"
@@ -260,7 +308,7 @@ export default class IterationItemContainer extends Component {
                         }
                       </td>
                       <td className={task.edit === 'priority' ? 'grid-edit' : null}
-                          onClick={this.editGrid.bind(this, task._id, 'priority')}>
+                          onClick={userData.isMaster ? this.editGrid.bind(this, task._id, 'priority') : null}>
                         {
                           task.edit === 'priority'
                             ? <select value={task.priority}
@@ -273,68 +321,86 @@ export default class IterationItemContainer extends Component {
                             : <span className={`priority-${task.priority}`}>P{task.priority}</span>
                         }
                       </td>
-                      <td>
-                        {finalEstimate && finalEstimate.time}
-                      </td>
                       {
-                        userList.map(user => {
-                          const developer = task.estimates.find(estimate => estimate.developer === user._id);
+                        userData.isMaster
+                          ? <td>
+                              {finalEstimate && finalEstimate.time}
+                            </td>
+                          : null
+                      }
+                      {
+                        userData.isMaster
+                          ? userList.map(user => {
+                              const developer = task.estimates.find(estimate => estimate.developer === user._id);
 
-                          return (
-                            <td className={task.edit === 'developer' ? 'grid-edit' : null}
-                                key={user._id}
-                                onClick={this.editGrid.bind(this, task._id, 'developer')}>
+                              return (
+                                <td className={task.edit === 'developer' ? 'grid-edit' : null}
+                                    key={user._id}
+                                    onClick={this.editGrid.bind(this, task._id, 'developer')}>
+                                  {
+                                    task.edit === 'developer'
+                                      ? <input type="text"
+                                               value={developer ? developer.time : ''}
+                                               onChange={this.estimateValueChange.bind(this, task._id, user._id)}
+                                               onBlur={::this.save} />
+                                      : developer && developer.time
+                                  }
+                                </td>
+                              );
+                            })
+                          : this.generateEstimateField(task, userData)
+                      }
+                      {
+                        userData.isMaster
+                          ? <td>
+                              <span className={cv > 0.5 ? 'cv-large' : null}>
+                                {cv ? cv.toFixed(2) : null}
+                              </span>
+                            </td>
+                          : null
+                      }
+                      {
+                        userData.isMaster
+                          ? <td className={task.edit === 'assignee' ? 'grid-edit' : null}
+                                onClick={this.editGrid.bind(this, task._id, 'assignee')}>
                               {
-                                task.edit === 'developer'
-                                  ? <input type="text"
-                                           value={developer ? developer.time : ''}
-                                           onChange={this.estimateValueChange.bind(this, task._id, user._id)}
-                                           onBlur={::this.save} />
-                                  : developer && developer.time
+                                task.edit === 'assignee'
+                                  ? <select value={task.assignee}
+                                            onChange={this.gridValueChange.bind(this, task._id, 'assignee')}
+                                            onBlur={::this.save}>
+                                  {
+                                    userList.map(user =>
+                                      <option value={user._id} key={user._id}>{user.name}</option>
+                                    )
+                                  }
+                                </select>
+                                  : assignee && assignee.name
                               }
                             </td>
-                          );
-                        })
+                          : null
                       }
-                      <td>
-                        <span className={cv > 0.5 ? 'cv-large' : null}>
-                          {cv ? cv.toFixed(2) : null}
-                        </span>
-                      </td>
-                      <td className={task.edit === 'assignee' ? 'grid-edit' : null}
-                          onClick={this.editGrid.bind(this, task._id, 'assignee')}>
-                        {
-                          task.edit === 'assignee'
-                            ? <select value={task.assignee}
-                                      onChange={this.gridValueChange.bind(this, task._id, 'assignee')}
-                                      onBlur={::this.save}>
-                                {
-                                  userList.map(user =>
-                                    <option value={user._id} key={user._id}>{user.name}</option>
-                                  )
-                                }
-                              </select>
-                            : assignee && assignee.name
-                        }
-                      </td>
-                      <td className={task.edit === 'status' ? 'grid-edit' : null}
-                          onClick={this.editGrid.bind(this, task._id, 'status')}>
-                        {
-                          task.edit === 'status'
-                            ? <select value={task.status}
-                                      onChange={this.gridValueChange.bind(this, task._id, 'status')}
-                                      onBlur={::this.save}>
-                                <option value="NOT_STARTED">Not Started</option>
-                                <option value="IN_PROGRESS">In Progress</option>
-                                <option value="DEVELOPED">Developed</option>
-                                <option value="TEST_FAILED">Test Failed</option>
-                                <option value="TEST_PASSED">Test Passed</option>
-                              </select>
-                            : <span className={ITERATION_STATUS[task.status].className}>
-                                {ITERATION_STATUS[task.status].text}
-                              </span>
-                        }
-                      </td>
+                      {
+                        userData.isMaster
+                          ? <td className={task.edit === 'status' ? 'grid-edit' : null}
+                                onClick={this.editGrid.bind(this, task._id, 'status')}>
+                              {
+                                task.edit === 'status'
+                                  ? <select value={task.status}
+                                            onChange={this.gridValueChange.bind(this, task._id, 'status')}
+                                            onBlur={::this.save}>
+                                  <option value="NOT_STARTED">Not Started</option>
+                                  <option value="IN_PROGRESS">In Progress</option>
+                                  <option value="DEVELOPED">Developed</option>
+                                  <option value="TEST_FAILED">Test Failed</option>
+                                  <option value="TEST_PASSED">Test Passed</option>
+                                </select>
+                                  : <span className={ITERATION_STATUS[task.status].className}>
+                                  {ITERATION_STATUS[task.status].text}
+                                </span>
+                              }
+                            </td>
+                          : null
+                      }
                     </tr>
                   );
                 })

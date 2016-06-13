@@ -4,17 +4,27 @@
 
 
 const initialState = {
+  userData: {},
 	userList: []
 };
 
 
-export default function (state = initialState, action = {}) {
+export default function (state = initialState, { type, data } = {}) {
 
-	switch (action.type) {
+	switch (type) {
+  case 'login-success':
+    return {
+      ...state,
+      login: true,
+      userData: {
+        ...data,
+        isMaster: data.role === 'MASTER'
+      }
+    };
 	case 'fetch-user-list-success':
 		return {
 			...state,
-			userList: action.data || []
+			userList: data || []
 		};
 	}
 

@@ -46,7 +46,6 @@ Promise.all([
 			<Provider store={store}>
 				<Router history={hashHistory}>
 					<Route path="/" component={HomeContainer}>
-						<IndexRedirect to="/iteration" />
 						<Route path="/dashboard" component={DashboardContainer} />
 						<Route path="/iteration" component={IterationContainer} />
 						<Route path="/iteration/:id" component={IterationItemContainer} />

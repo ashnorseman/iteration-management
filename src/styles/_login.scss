@@ -1,0 +1,24 @@
+/**
+ * Created by Ash on 2016-06-13.
+ */
+
+
+.login-form {
+  @extend .card;
+  margin: 8% auto;
+  max-width: 420px;
+  padding: $gap * 3;
+
+  input,
+  button {
+    border-radius: 0.4rem;
+    height: 4rem;
+    margin-top: $gap * 1.5;
+    width: 100%;
+  }
+}
+
+.login-form-title {
+  margin: $gap 0 $gap * 2;
+  text-align: center;
+}

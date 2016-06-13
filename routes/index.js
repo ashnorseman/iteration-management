@@ -5,10 +5,15 @@ var express = require('express'),
 /* login. */
 router.post('/login', function(req, res, next) {
 
-  User.findOne(req.body, function (error, user) {
+  User.findOne({
+    userName: req.body.userName,
+    password: req.body.password
+  }, function (error, user) {
     if (error) console.error(error);
 
-    res.sendStatus((error || !user) ? 401 : 200);
+    error
+      ? res.sendStatus(401)
+      : res.json(user);
   });
 });
 

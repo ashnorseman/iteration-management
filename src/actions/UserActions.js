@@ -8,6 +8,25 @@ import fetchie from 'fetchie';
 
 export default {
 
+  login(data) {
+
+    return dispatch => {
+      return fetchie
+        .post('/login')
+        .send(data)
+        .handleError(() => {
+          alert('Login failed');
+        })
+        .then(res => {
+          dispatch({
+            type: 'login-success',
+            data: res
+          });
+          location.hash = '#/iteration';
+        });
+    };
+  },
+
 	fetchUserList() {
 
 		return dispatch => {
