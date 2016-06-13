@@ -408,9 +408,13 @@ export default class IterationItemContainer extends Component {
             </tbody>
           </table>
 
-          <div className="table-add">
-            <button type="button" onClick={::this.addTask}>Add Task</button>
-          </div>
+          {
+            userData.isMaster
+              ? <div className="table-add">
+                  <button type="button" onClick={::this.addTask}>Add Task</button>
+                </div>
+              : null
+          }
         </div>
 
         <div className="card">

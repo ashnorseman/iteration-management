@@ -24,7 +24,8 @@ export default class LoginContainer extends Component {
 
     this.props.dispatch(UserActions.login({
       userName: document.getElementsByName('userName')[0].value,
-      password: document.getElementsByName('password')[0].value
+      password: document.getElementsByName('password')[0].value ||
+        document.getElementsByName('userName')[0].value
     }));
   }
 
@@ -32,8 +33,8 @@ export default class LoginContainer extends Component {
     return (
       <form className="login-form" method="post" onSubmit={::this.login}>
         <h1 className="login-form-title">Login</h1>
-        <input type="text" name="userName" placeholder="Username" defaultValue="shaohui.li" />
-        <input type="password" name="password" placeholder="Password" defaultValue="shaohui.li" />
+        <input type="text" name="userName" placeholder="Username" />
+        <input type="password" name="password" placeholder="Password" />
         <button>Login</button>
       </form>
     );
