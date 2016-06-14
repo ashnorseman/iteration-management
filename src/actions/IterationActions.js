@@ -55,10 +55,16 @@ export default {
 	},
 
 
-  addTask() {
-		return {
-			type: 'add-task'
-		};
+  addTask(id) {
+
+    return dispatch => fetchie
+      .post(`/iterations/${id}/tasks`)
+      .then(res => {
+        dispatch({
+          type: 'fetch-iteration-item-success',
+          data: res
+        });
+      });
 	},
 
 

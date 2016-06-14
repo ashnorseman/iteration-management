@@ -13,6 +13,7 @@ button,
 	letter-spacing: 0.1rem;
 	min-width: 5em;
 	padding: 0 1em;
+  text-align: center;
 	@include transition;
 
 	&:hover {

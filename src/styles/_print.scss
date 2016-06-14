@@ -4,6 +4,8 @@
 
 
 .print {
+  background: $print-bg;
+  overflow: auto;
   padding: 0;
 }
 

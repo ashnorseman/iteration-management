@@ -36,19 +36,25 @@ fetchie
     this.timeout(100000);
   });
 
+
 Promise.all([
 	store.dispatch(UserActions.fetchUserList()),
 	store.dispatch(IterationActions.fetchIterationList())
 ])
 	.then(() => {
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    if (user) {
+      store.dispatch(UserActions.readFromLocal(user));
+    }
 
 		ReactDOM.render((
 			<Provider store={store}>
 				<Router history={hashHistory}>
 					<Route path="/" component={HomeContainer}>
-						<Route path="/dashboard" component={DashboardContainer} />
-						<Route path="/iteration" component={IterationContainer} />
-						<Route path="/iteration/:id" component={IterationItemContainer} />
+						<Route name="dashboard" path="dashboard" component={DashboardContainer} />
+						<Route name="iteration" path="iteration" component={IterationContainer} />
+						<Route name="iteration.item" path="iteration/:id" component={IterationItemContainer} />
 					</Route>
           <Route path="/print/:id" component={PrintContainer} />
         </Router>

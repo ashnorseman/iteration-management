@@ -9,6 +9,8 @@ import Link from 'react-router/lib/Link';
 
 import LoginContainer from './LoginContainer';
 
+import UserActions from '../actions/UserActions';
+
 
 @connect(state => ({
   user: state.user
@@ -17,8 +19,13 @@ export default class HomeContainer extends Component {
 
 	static propTypes = {
 		children: PropTypes.node,
+		dispatch: PropTypes.func,
 		user: PropTypes.object
 	};
+
+  logout() {
+    this.props.dispatch(UserActions.logout());
+  }
 
 	render() {
 
@@ -28,9 +35,10 @@ export default class HomeContainer extends Component {
             <header className="site-header">
               <a href="/" className="site-header-logo">Loyalty</a>
               <nav className="site-nav">
-                <Link to="/dashboard" activeClassName="active">Dashboard</Link>
-                <Link to="/iteration" activeClassName="active">Iteration</Link>
+                <Link to="dashboard" activeClassName="active">Dashboard</Link>
+                <Link to="iteration" activeClassName="active">Iteration</Link>
               </nav>
+              <a className="site-logout" onClick={::this.logout}>Logout</a>
             </header>
 
             {this.props.children}

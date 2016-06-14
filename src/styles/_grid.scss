@@ -10,6 +10,7 @@ td {
 }
 
 th {
+  background: $color-bg-gray-lightest;
 	color: $color-text-dark;
 	font-weight: 500;
 }
@@ -23,9 +24,39 @@ tbody tr:hover {
 	cursor: pointer;
 }
 
-.table-add {
-	padding-top: $gap * 2;
-	text-align: right;
+.grid-holder {
+  position: relative;
+  height: 80vh;
+}
+
+.grid-header {
+  position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.grid-content {
+  overflow: auto;
+  position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+  &:not(:last-child) {
+    bottom: $control-height + $gap * 2;
+  }
+}
+
+.grid-footer {
+  padding-top: $gap * 2;
+  position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  text-align: right;
 }
 
 .grid-edit {

@@ -25,7 +25,7 @@ export default class IterationContainer extends Component {
 
 
 	viewIteration(id) {
-		location.hash = `/iteration/${id}`;
+		location.hash = `iteration/${id}`;
 	}
 
 

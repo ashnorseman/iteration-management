@@ -63,7 +63,10 @@ export default class IterationItemContainer extends Component {
                     <span className="print-issue">Issue:</span>
                     <span className="print-estimate">{`预估时间：${estimate ? estimate.time : 0}d`}</span>
                   </p>
-                  <p className="print-task-name">{`【${task.module}】【${task.subModule}】${task.taskName}`}</p>
+                  <p className="print-task-name">
+                    {task.module ? `【${task.module}】` : ''}
+                    {task.subModule ? `【${task.subModule}】` : ''}
+                    {task.taskName}</p>
                   <p>
                     <span className="print-start">Start:</span>
                     <span className="print-end">End:</span>

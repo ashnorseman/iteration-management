@@ -17,13 +17,13 @@ var moment = require('moment'),
     },
     taskName: {
       type: String,
-      maxlength: 200,
-      required: true
+      maxlength: 200
     },
     priority: {
       type: Number,
       min: 0,
-      max: 2
+      max: 2,
+      default: 0
     },
     estimates: [{
       developer: Schema.Types.ObjectId,

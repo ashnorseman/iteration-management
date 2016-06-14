@@ -41,3 +41,11 @@
 		}
 	}
 }
+
+.site-logout {
+  color: $color-primary;
+  cursor: pointer;
+  float: right;
+  line-height: $logo-size * $line-height;
+  padding: $gap 0;
+}
