@@ -9,6 +9,7 @@ import './styles/app.scss';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import hashHistory from 'react-router/lib/hashHistory';
+import IndexRedirect from 'react-router/lib/IndexRedirect';
 import Router from 'react-router/lib/Router';
 import Route from 'react-router/lib/Route';
 import createStore from 'redux/lib/createStore';
@@ -16,6 +17,13 @@ import applyMiddleware from 'redux/lib/applyMiddleware';
 import { Provider } from 'react-redux';
 import thunkMiddleware from 'redux-thunk';
 import fetchie from 'fetchie';
+
+import 'echarts/lib/chart/bar';
+import 'echarts/lib/chart/line';
+import 'echarts/lib/chart/pie';
+import 'echarts/lib/component/tooltip';
+import 'echarts/lib/component/legend';
+import 'echarts/lib/component/markPoint';
 
 import reducers from './reducers';
 
@@ -52,6 +60,7 @@ Promise.all([
 			<Provider store={store}>
 				<Router history={hashHistory}>
 					<Route path="/" component={HomeContainer}>
+            <IndexRedirect to="dashboard" />
 						<Route name="dashboard" path="dashboard" component={DashboardContainer} />
 						<Route name="iteration" path="iteration" component={IterationContainer} />
 						<Route name="iteration.item" path="iteration/:id" component={IterationItemContainer} />

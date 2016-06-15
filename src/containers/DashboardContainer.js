@@ -5,13 +5,7 @@
 
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-
 import echarts from 'echarts/lib/echarts';
-import 'echarts/lib/chart/bar';
-import 'echarts/lib/chart/line';
-import 'echarts/lib/component/tooltip';
-import 'echarts/lib/component/legend';
-import 'echarts/lib/component/markPoint';
 
 
 @connect(state => ({

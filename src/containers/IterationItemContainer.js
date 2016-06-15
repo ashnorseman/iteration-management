@@ -5,6 +5,7 @@
 
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import echarts from 'echarts/lib/echarts';
 
 import { ITERATION_STATUS } from '../constants';
 
@@ -46,6 +47,43 @@ export default class IterationItemContainer extends Component {
     }, false);
 
     document.body.addEventListener('mouseover', this.letBodyScrollAuto, false);
+  }
+
+
+  componentDidUpdate() {
+    const tasks = this.props.iteration.currentIteration.tasks || [],
+      status = ['NOT_STARTED', 'IN_PROGRESS', 'DEVELOPED', 'TEST_FAILED', 'TEST_PASSED'],
+      statusList = [0, 0, 0, 0, 0],
+      chart = echarts.init(this.refs.taskChart);
+
+    tasks.forEach(task => {
+      statusList[status.indexOf(task.status)] += 1;
+    });
+
+    chart.setOption({
+      color: ['#fbca35', '#ff8acc', '#aa81f3', '#e96154', '#4db47d'],
+      tooltip: {},
+      legend: {
+        data: status
+      },
+      series: [
+        {
+          type: 'pie',
+          // label: {
+          //   normal: {
+          //     show: true,
+          //     textStyle: {
+          //       fontSize: 18
+          //     }
+          //   }
+          // },
+          data: statusList.map((item, index) => ({
+            value: item,
+            name: status[index]
+          }))
+        }
+      ]
+    });
   }
 
 
@@ -108,7 +146,7 @@ export default class IterationItemContainer extends Component {
     return (this.props.iteration.currentIteration.tasks || [])
       .filter(task => task.assignee === developer &&
          (priority !== null ? task.priority === priority : true) &&
-         (finished ? task.status === 'TEST_PASSED' : true))
+         (finished ? (task.status === 'TEST_PASSED' || task.status === 'DEVELOPED') : true))
       .reduce((result, task) => {
         return result + this.getFinalEstimate(task);
       }, 0);
@@ -174,6 +212,11 @@ export default class IterationItemContainer extends Component {
       tableHeader = (
         <thead>
           <tr>
+            {
+              viewMode
+                ? <th style={{width: '8em'}}>Status</th>
+                : null
+            }
             <th style={{width: '7em'}}>Module</th>
             <th style={{width: '7em'}}>Sub-Module</th>
             <th>Task Name</th>
@@ -196,11 +239,6 @@ export default class IterationItemContainer extends Component {
             {
               viewMode
                 ? <th style={{width: '6em'}}>Assignee</th>
-                : null
-            }
-            {
-              viewMode
-                ? <th style={{width: '8em'}}>Status</th>
                 : null
             }
           </tr>
@@ -320,6 +358,28 @@ export default class IterationItemContainer extends Component {
 
                       return (
                         <tr key={task._id}>
+                          {
+                            viewMode
+                              ? <td className={task.edit === 'status' ? 'grid-edit' : null}
+                                    onClick={userData.isMaster ? this.editGrid.bind(this, task._id, 'status') : null}>
+                              {
+                                task.edit === 'status'
+                                  ? <select value={task.status || 'NOT_STARTED'}
+                                            onChange={this.gridValueChange.bind(this, task._id, 'status')}
+                                            onBlur={this.saveTask.bind(this, task)}>
+                                  <option value="NOT_STARTED">Not Started</option>
+                                  <option value="IN_PROGRESS">In Progress</option>
+                                  <option value="DEVELOPED">Developed</option>
+                                  <option value="TEST_FAILED">Test Failed</option>
+                                  <option value="TEST_PASSED">Test Passed</option>
+                                </select>
+                                  : <span className={ITERATION_STATUS[task.status].className}>
+                                  {ITERATION_STATUS[task.status].text}
+                                </span>
+                              }
+                            </td>
+                              : null
+                          }
                           <td className={task.edit === 'module' ? 'grid-edit' : null}
                               onClick={userData.isMaster ? this.editGrid.bind(this, task._id, 'module') : null}>
                             {
@@ -426,28 +486,6 @@ export default class IterationItemContainer extends Component {
                             </td>
                               : null
                           }
-                          {
-                            viewMode
-                              ? <td className={task.edit === 'status' ? 'grid-edit' : null}
-                                    onClick={userData.isMaster ? this.editGrid.bind(this, task._id, 'status') : null}>
-                              {
-                                task.edit === 'status'
-                                  ? <select value={task.status || 'NOT_STARTED'}
-                                            onChange={this.gridValueChange.bind(this, task._id, 'status')}
-                                            onBlur={this.saveTask.bind(this, task)}>
-                                  <option value="NOT_STARTED">Not Started</option>
-                                  <option value="IN_PROGRESS">In Progress</option>
-                                  <option value="DEVELOPED">Developed</option>
-                                  <option value="TEST_FAILED">Test Failed</option>
-                                  <option value="TEST_PASSED">Test Passed</option>
-                                </select>
-                                  : <span className={ITERATION_STATUS[task.status].className}>
-                                  {ITERATION_STATUS[task.status].text}
-                                </span>
-                              }
-                            </td>
-                              : null
-                          }
                         </tr>
                       );
                     })
@@ -506,6 +544,12 @@ export default class IterationItemContainer extends Component {
               }
             </tbody>
           </table>
+        </div>
+
+        <div className="card">
+          <h2>Task Status</h2>
+
+          <section ref="taskChart" style={{height: 500}} />
         </div>
       </main>
     );
