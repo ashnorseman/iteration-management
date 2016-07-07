@@ -156,5 +156,24 @@ export default {
 					});
 				});
 		};
-	}
+	},
+
+
+  saveTaskEstimate(iterationId, taskId, userId, time) {
+
+    return dispatch => {
+
+      return fetchie
+        .put(`/iterations/${iterationId}/tasks/${taskId}/users/${userId}`)
+        .send({
+          time
+        })
+        .then(res => {
+          dispatch({
+            type: 'fetch-iteration-item-success',
+            data: res
+          });
+        });
+    };
+  }
 };

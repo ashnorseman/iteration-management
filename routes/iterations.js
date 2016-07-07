@@ -115,7 +115,7 @@ router.delete('/:id/tasks/:taskId', function(req, res, next) {
   });
 });
 
-/* POST edit a task. */
+/* PUT edit a task. */
 router.put('/:id/tasks/:taskId', function(req, res, next) {
   if (!req.body.assignee) req.body.assignee = null;
 
@@ -129,6 +129,44 @@ router.put('/:id/tasks/:taskId', function(req, res, next) {
     if (!task.length) return res.sendStatus(400);
 
     Object.assign(task[0], req.body);
+
+    iteration.save(function (error, iteration) {
+      if (error) console.log(error);
+
+      error
+        ? res.sendStatus(400)
+        : res.json(iteration);
+    });
+  });
+});
+
+/* PUT edit a task estimate time. */
+router.put('/:id/tasks/:taskId/users/:userId', function(req, res, next) {
+  if (!req.body.time) return res.sendStatus(400);
+
+  Iteration.findById(req.params.id, function (error, iteration) {
+    if (error) console.log(error);
+
+    var task = iteration.tasks.find(function (task) {
+      return task._id.toString() === req.params.taskId;
+    });
+
+    if (!task) return res.sendStatus(400);
+
+    if (!task.estimates) task.estimates = [];
+
+    var estimate = task.estimates.find(function (estimate) {
+      return estimate.developer.toString() === req.params.userId;
+    });
+
+    if (estimate) {
+      estimate.time = +req.body.time;
+    } else {
+      task.estimates.push({
+        developer: req.params.userId,
+        time: req.body.time
+      });
+    }
 
     iteration.save(function (error, iteration) {
       if (error) console.log(error);

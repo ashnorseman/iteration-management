@@ -16,6 +16,7 @@ import createStore from 'redux/lib/createStore';
 import applyMiddleware from 'redux/lib/applyMiddleware';
 import { Provider } from 'react-redux';
 import thunkMiddleware from 'redux-thunk';
+import 'whatwg-fetch';
 import fetchie from 'fetchie';
 
 import 'echarts/lib/chart/bar';
