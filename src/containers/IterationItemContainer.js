@@ -131,12 +131,14 @@ export default class IterationItemContainer extends Component {
   }
 
 
-  getFinalEstimate(task) {
+  getFinalEstimate(task, qa) {
+    const estimate = task.estimates.find(estimate => estimate.developer === (qa || task.assignee));
+
+    if (qa && estimate) return estimate.time;
+
     const assignee = task.assignee;
 
     if (!assignee || !task.estimates || !task.estimates.length) return null;
-
-    const estimate = task.estimates.find(estimate => estimate.developer === task.assignee);
 
     return estimate ? estimate.time : null;
   }
@@ -144,11 +146,11 @@ export default class IterationItemContainer extends Component {
 
   getTotalWorkload(developer, priority, finished) {
     return (this.props.iteration.currentIteration.tasks || [])
-      .filter(task => task.assignee === developer &&
+      .filter(task => (developer.position === 'QA' || task.assignee === developer._id) &&
          (priority !== null ? task.priority === priority : true) &&
          (finished ? (task.status === 'TEST_PASSED' || task.status === 'DEVELOPED') : true))
       .reduce((result, task) => {
-        return result + this.getFinalEstimate(task);
+        return result + this.getFinalEstimate(task, (developer.position === 'QA') && developer._id);
       }, 0);
   }
 
@@ -370,22 +372,22 @@ export default class IterationItemContainer extends Component {
                             viewMode
                               ? <td className={task.edit === 'status' ? 'grid-edit' : null}
                                     onClick={userData.isMaster ? this.editGrid.bind(this, task._id, 'status') : null}>
-                              {
-                                task.edit === 'status'
-                                  ? <select value={task.status || 'NOT_STARTED'}
-                                            onChange={this.gridValueChange.bind(this, task._id, 'status')}
-                                            onBlur={this.saveTask.bind(this, task)}>
-                                  <option value="NOT_STARTED">Not Started</option>
-                                  <option value="IN_PROGRESS">In Progress</option>
-                                  <option value="DEVELOPED">Developed</option>
-                                  <option value="TEST_FAILED">Test Failed</option>
-                                  <option value="TEST_PASSED">Test Passed</option>
-                                </select>
-                                  : <span className={ITERATION_STATUS[task.status].className}>
-                                  {ITERATION_STATUS[task.status].text}
-                                </span>
-                              }
-                            </td>
+                                  {
+                                    task.edit === 'status'
+                                      ? <select value={task.status || 'NOT_STARTED'}
+                                                onChange={this.gridValueChange.bind(this, task._id, 'status')}
+                                                onBlur={this.saveTask.bind(this, task)}>
+                                          <option value="NOT_STARTED">Not Started</option>
+                                          <option value="IN_PROGRESS">In Progress</option>
+                                          <option value="DEVELOPED">Developed</option>
+                                          <option value="TEST_FAILED">Test Failed</option>
+                                          <option value="TEST_PASSED">Test Passed</option>
+                                        </select>
+                                      : <span className={ITERATION_STATUS[task.status].className}>
+                                      {ITERATION_STATUS[task.status].text}
+                                    </span>
+                                  }
+                                </td>
                               : null
                           }
                           <td className={task.edit === 'module' ? 'grid-edit' : null}
@@ -425,21 +427,21 @@ export default class IterationItemContainer extends Component {
                             viewMode
                               ? <td className={task.edit === 'assignee' ? 'grid-edit' : null}
                                     onClick={userData.isMaster ? this.editGrid.bind(this, task._id, 'assignee') : null}>
-                              {
-                                task.edit === 'assignee'
-                                  ? <select value={task.assignee || ''}
-                                            onChange={this.gridValueChange.bind(this, task._id, 'assignee')}
-                                            onBlur={this.saveTask.bind(this, task)}>
-                                  <option value="" />
                                   {
-                                    userList.map(user =>
-                                      <option value={user._id} key={user._id}>{user.name}</option>
-                                    )
+                                    task.edit === 'assignee'
+                                      ? <select value={task.assignee || ''}
+                                                onChange={this.gridValueChange.bind(this, task._id, 'assignee')}
+                                                onBlur={this.saveTask.bind(this, task)}>
+                                      <option value="" />
+                                      {
+                                        userList.map(user =>
+                                          <option value={user._id} key={user._id}>{user.name}</option>
+                                        )
+                                      }
+                                    </select>
+                                      : assignee && assignee.name
                                   }
-                                </select>
-                                  : assignee && assignee.name
-                              }
-                            </td>
+                                </td>
                               : null
                           }
                           <td className={task.edit === 'priority' ? 'grid-edit' : null}
@@ -449,49 +451,49 @@ export default class IterationItemContainer extends Component {
                                 ? <select value={task.priority || 0}
                                           onChange={this.gridValueChange.bind(this, task._id, 'priority')}
                                           onBlur={this.saveTask.bind(this, task)}>
-                                <option value="0">P0</option>
-                                <option value="1">P1</option>
-                                <option value="2">P2</option>
-                              </select>
+                                    <option value="0">P0</option>
+                                    <option value="1">P1</option>
+                                    <option value="2">P2</option>
+                                  </select>
                                 : <span className={`priority-${task.priority}`}>P{task.priority}</span>
                             }
                           </td>
                           {
                             viewMode
                               ? <td>
-                              {finalEstimate && finalEstimate.time}
-                            </td>
+                                  {finalEstimate && finalEstimate.time}
+                                </td>
                               : null
                           }
                           {
                             viewMode
                               ? userList.map(user => {
-                              const developer = task.estimates.find(estimate => estimate.developer === user._id);
+                                  const developer = task.estimates.find(estimate => estimate.developer === user._id);
 
-                              return (
-                                <td className={task.edit === 'developer' ? 'grid-edit' : null}
-                                    key={user._id}
-                                    onClick={userData.isMaster ? this.editGrid.bind(this, task._id, 'developer') : null}>
-                                  {
-                                    task.edit === 'developer'
-                                      ? <input type="text"
-                                               value={developer ? developer.time : ''}
-                                               onChange={this.estimateValueChange.bind(this, task._id, user._id)}
-                                               onBlur={this.saveTask.bind(this, task)} />
-                                      : developer && developer.time
-                                  }
-                                </td>
-                              );
-                            })
+                                  return (
+                                    <td className={task.edit === 'developer' ? 'grid-edit' : null}
+                                        key={user._id}
+                                        onClick={userData.isMaster ? this.editGrid.bind(this, task._id, 'developer') : null}>
+                                      {
+                                        task.edit === 'developer'
+                                          ? <input type="text"
+                                                   value={developer ? developer.time : ''}
+                                                   onChange={this.estimateValueChange.bind(this, task._id, user._id)}
+                                                   onBlur={this.saveTask.bind(this, task)} />
+                                          : developer && developer.time
+                                      }
+                                    </td>
+                                  );
+                                })
                               : this.generateEstimateField(task, userData)
                           }
                           {
                             viewMode
                               ? <td>
-                              <span className={cv > 0.5 ? 'cv-large' : null}>
-                                {cv ? cv.toFixed(2) : null}
-                              </span>
-                            </td>
+                                  <span className={cv > 0.5 ? 'cv-large' : null}>
+                                    {cv ? cv.toFixed(2) : null}
+                                  </span>
+                                </td>
                               : null
                           }
                         </tr>
@@ -532,11 +534,11 @@ export default class IterationItemContainer extends Component {
 
             <tbody>
               {
-                this.fullDeveloperList.map(developer => {
-                  const p0 = this.getTotalWorkload(developer._id, 0),
-                    p1 = this.getTotalWorkload(developer._id, 1),
-                    p2 = this.getTotalWorkload(developer._id, 2),
-                    finished = this.getTotalWorkload(developer._id, null, true);
+                this.props.user.userList.map(developer => {
+                  const p0 = this.getTotalWorkload(developer, 0),
+                    p1 = this.getTotalWorkload(developer, 1),
+                    p2 = this.getTotalWorkload(developer, 2),
+                    finished = this.getTotalWorkload(developer, null, true);
 
                   return (
                     <tr key={developer._id}>

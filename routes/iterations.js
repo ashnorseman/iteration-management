@@ -142,7 +142,7 @@ router.put('/:id/tasks/:taskId', function(req, res, next) {
 
 /* PUT edit a task estimate time. */
 router.put('/:id/tasks/:taskId/users/:userId', function(req, res, next) {
-  if (!req.body.time) return res.sendStatus(400);
+  if (!req.body.time) req.body.time = 0;
 
   Iteration.findById(req.params.id, function (error, iteration) {
     if (error) console.log(error);
