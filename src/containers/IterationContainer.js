@@ -126,7 +126,7 @@ export default class IterationContainer extends Component {
 											<td>{iteration.startDate}</td>
 											<td>{iteration.deadline}</td>
 											<td>{iteration.endDate}</td>
-											<td>{iteration.tasks ? iteration.tasks.length : 0}</td>
+											<td>{iteration.total}</td>
 											<td>
 												<span className={ITERATION_STATUS[iteration.status].className}>
 													{ITERATION_STATUS[iteration.status].text}

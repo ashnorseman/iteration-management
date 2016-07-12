@@ -243,7 +243,9 @@ export default class IterationItemContainer extends Component {
             }
             {
               viewMode
-                ? userList.map(user => <th key={user._id} style={{width: '4.5em'}}>{user.name}</th>)
+                ? (currentIteration.developers || []).map(d => <th key={d} style={{width: '4.5em'}}>
+                    {userList.find(user => user._id === d).name}
+                  </th>)
                 : <th style={{width: '4.5em'}}>{userData.name}</th>
             }
             {
@@ -467,18 +469,18 @@ export default class IterationItemContainer extends Component {
                           }
                           {
                             viewMode
-                              ? userList.map(user => {
-                                  const developer = task.estimates.find(estimate => estimate.developer === user._id);
+                              ? currentIteration.developers.map(user => {
+                                  const developer = task.estimates.find(estimate => estimate.developer === user);
 
                                   return (
                                     <td className={task.edit === 'developer' ? 'grid-edit' : null}
-                                        key={user._id}
+                                        key={user}
                                         onClick={userData.isMaster ? this.editGrid.bind(this, task._id, 'developer') : null}>
                                       {
                                         task.edit === 'developer'
                                           ? <input type="text"
                                                    value={developer ? developer.time : ''}
-                                                   onChange={this.estimateValueChange.bind(this, task._id, user._id)}
+                                                   onChange={this.estimateValueChange.bind(this, task._id, user)}
                                                    onBlur={this.saveTask.bind(this, task)} />
                                           : developer && developer.time
                                       }

@@ -21,22 +21,11 @@ export default class IterationContainer extends Component {
 
   componentDidMount() {
     const chart = echarts.init(this.refs.taskChart),
-      list = this.props.iteration.iterationList,
-      xAxis = [],
-      finishedSeries = [],
-      pendingSeries = [],
-      total = [];
-
-    list.forEach(item => {
-      item.tasks || (item.tasks = []);
-
-      const finished = item.tasks.filter(task => task.status === 'TEST_PASSED').length;
-
-      xAxis.unshift(`${item.year}-${item.number}`);
-      finishedSeries.unshift(finished);
-      pendingSeries.unshift(item.tasks.length - finished);
-      total.unshift(item.tasks.length);
-    });
+      list = [].concat(this.props.iteration.iterationList).reverse(),
+      xAxis = list.map(item => `${item.year}-${item.number}`),
+      finishedSeries = list.map(item => item.finished),
+      pendingSeries = list.map(item => item.pending),
+      total = list.map(item => item.total);
 
     chart.setOption({
       color: ['#4db47d', '#fbca35', '#ff8acc'],

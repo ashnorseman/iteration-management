@@ -6,12 +6,21 @@ router.get('/', function(req, res, next) {
 
   Iteration.find({}, null, {
     sort: '-startDate'
-  }, function (error, iterations) {
+  }).select('-developers').exec(function (error, iterations) {
     if (error) console.error(error);
 
     error
       ? res.sendStatus(400)
-      : res.json(iterations);
+      : res.json(iterations.map(i => {
+          var result = Object.assign({}, i.toJSON());
+
+          result.total = i.tasks.length;
+          result.finished = i.tasks.filter(task => task.status === 'TEST_PASSED').length;
+          result.pending = result.total - result.finished;
+          delete result.tasks;
+
+          return result;
+        }).slice(0, 10));
   });
 });
 
